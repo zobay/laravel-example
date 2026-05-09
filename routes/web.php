@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentCallbackController;
+use App\Http\Controllers\TransactionValidationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -15,3 +16,6 @@ Route::post('/payment/success', [PaymentCallbackController::class, 'success'])->
 Route::post('/payment/fail',    [PaymentCallbackController::class, 'fail'])->name('payment.fail');
 Route::post('/payment/cancel',  [PaymentCallbackController::class, 'cancel'])->name('payment.cancel');
 Route::post('/payment/ipn',     [PaymentCallbackController::class, 'ipn'])->name('payment.ipn');
+
+Route::get('/transaction/validate',  [TransactionValidationController::class, 'show'])->name('transaction.validate.show');
+Route::post('/transaction/validate', [TransactionValidationController::class, 'validate'])->name('transaction.validate');

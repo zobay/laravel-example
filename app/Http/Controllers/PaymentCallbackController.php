@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
+use Zobay\LaravelSslCommerz\DTOs\IpnData;
+use Zobay\LaravelSslCommerz\DTOs\ValidationRequestData;
 use Zobay\LaravelSslCommerz\Exceptions\OrderValidationException;
 use Zobay\LaravelSslCommerz\Facades\SslCommerz;
 
@@ -18,7 +20,12 @@ class PaymentCallbackController extends Controller
         $currency = $request->input('currency', 'BDT');
 
         try {
-            $result = SslCommerz::validateOrder($valId, $tranId, $amount, $currency);
+            $result = SslCommerz::validateOrder(new ValidationRequestData(
+                valId:    $valId,
+                tranId:   $tranId,
+                amount:   $amount,
+                currency: $currency,
+            ));
         } catch (OrderValidationException $e) {
             return view('payment.fail', [
                 'reason' => 'Payment validation failed: ' . $e->getMessage(),
@@ -54,7 +61,7 @@ class PaymentCallbackController extends Controller
 
     public function ipn(Request $request): Response
     {
-        if (! SslCommerz::verifyIpnHash($request->all())) {
+        if (! SslCommerz::verifyIpnHash(IpnData::fromPostData($request->all()))) {
             return response('Invalid IPN signature', 400);
         }
 
